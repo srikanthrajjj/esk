@@ -34,9 +34,12 @@
     "vite": "^5.0.8"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "16.x"
   },
   "glitch": {
-    "projectType": "generated_static"
+    "projectType": "app",
+    "installDependencies": true,
+    "buildCommand": "npm run build",
+    "startCommand": "npm start"
   }
 }
