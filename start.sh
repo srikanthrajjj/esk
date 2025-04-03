@@ -1,2 +1,3 @@
 #!/bin/bash
-NODE_ENV=production node server.cjs 
+export NODE_ENV=production
+/usr/local/bin/node server.cjs 

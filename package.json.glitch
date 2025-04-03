@@ -1,0 +1,13 @@
+{
+  "name": "esko-police-victim-app",
+  "version": "1.0.0",
+  "description": "Police and victim communication application",
+  "main": "server.cjs",
+  "engines": {
+    "node": "16.x"
+  },
+  "glitch": {
+    "projectType": "app",
+    "startCommand": "bash start.sh"
+  }
+} 

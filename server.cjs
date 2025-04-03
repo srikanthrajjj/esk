@@ -236,6 +236,8 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';  // Listen on all network interfaces
 
+console.log(`Starting server on port ${PORT}`);
+
 server.on('error', (error) => {
   console.error('Server error:', error);
   
