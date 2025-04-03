@@ -1,19 +1,99 @@
 const http = require('http');
 const { Server } = require('socket.io');
+const fs = require('fs');
+const path = require('path');
+
+// Determine if we're in production mode
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Create an HTTP server
-const server = http.createServer();
+const server = http.createServer((req, res) => {
+  // In production, serve static files from the dist directory
+  if (isProduction && req.url !== '/socket.io/') {
+    const filePath = path.join(__dirname, 'dist', req.url === '/' ? 'index.html' : req.url);
+    
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        // If file not found, serve index.html (for SPA routing)
+        fs.readFile(path.join(__dirname, 'dist', 'index.html'), (err, content) => {
+          if (err) {
+            res.writeHead(500);
+            res.end('Error loading index.html');
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.end(content, 'utf-8');
+        });
+        return;
+      }
+      
+      // Determine content type based on file extension
+      const extname = path.extname(filePath);
+      let contentType = 'text/html';
+      
+      switch (extname) {
+        case '.js':
+          contentType = 'text/javascript';
+          break;
+        case '.css':
+          contentType = 'text/css';
+          break;
+        case '.json':
+          contentType = 'application/json';
+          break;
+        case '.png':
+          contentType = 'image/png';
+          break;
+        case '.jpg':
+          contentType = 'image/jpg';
+          break;
+        case '.svg':
+          contentType = 'image/svg+xml';
+          break;
+      }
+      
+      // Read and serve the file
+      fs.readFile(filePath, (err, content) => {
+        if (err) {
+          res.writeHead(500);
+          res.end(`Error loading ${filePath}`);
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(content, 'utf-8');
+      });
+    });
+  } else {
+    // For WebSocket requests, let Socket.io handle them
+    res.writeHead(404);
+    res.end();
+  }
+});
+
+// Determine allowed origins based on environment
+const getAllowedOrigins = () => {
+  if (isProduction) {
+    // In production, be more restrictive with CORS
+    return [
+      process.env.FRONTEND_URL || 'https://esko-frontend.onrender.com',
+      'https://esko-backend.onrender.com'
+    ];
+  } else {
+    // In development, allow all origins
+    return '*';
+  }
+};
 
 // Create a Socket.io server with CORS configuration
 const io = new Server(server, {
   cors: {
-    origin: '*',  // Allow all origins in development
+    origin: getAllowedOrigins(),
     methods: ['GET', 'POST'],
     credentials: true
   },
   pingTimeout: 60000,
   pingInterval: 25000,
-  transports: ['websocket'],
+  transports: ['websocket', 'polling'], // Allow polling as fallback in production
   allowEIO3: true
 });
 
