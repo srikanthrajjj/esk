@@ -8,20 +8,25 @@ export default defineConfig(({ mode }) => {
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), '');
   
+  // Set NODE_ENV based on mode
+  process.env.NODE_ENV = mode;
+  
   return {
     plugins: [react()],
     root: '.',
     base: '/',
     define: {
       // Make env variables available in the client code
-      'process.env': env
+      'process.env.NODE_ENV': JSON.stringify(mode)
     },
     build: {
       outDir: 'dist',
       sourcemap: mode !== 'production', // Only generate sourcemaps in development
       minify: mode === 'production',
       rollupOptions: {
-        input: path.resolve(__dirname, 'index.html'),
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+        },
         output: {
           manualChunks: {
             vendor: ['react', 'react-dom', 'socket.io-client'],

@@ -16,10 +16,13 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "allowJs": true
   },
   "include": [
     "src",
-    "vite.config.ts"
-  ]
+    "vite.config.ts",
+    "server.cjs"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

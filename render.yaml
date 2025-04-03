@@ -3,7 +3,7 @@ services:
   - type: web
     name: esko-frontend
     env: static
-    buildCommand: npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     headers:
       - path: /*
@@ -28,7 +28,5 @@ services:
     buildCommand: npm install
     startCommand: npm run start:prod
     envVars:
-      - key: NODE_ENV
-        value: production
       - key: PORT
         value: 3001 

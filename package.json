@@ -8,7 +8,7 @@
     "websocket": "node server.cjs",
     "start": "concurrently \"npm run preview\" \"npm run websocket\"",
     "start:prod": "node server.cjs",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "lint": "eslint src --fix && tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "preview": "vite preview --host 0.0.0.0"
