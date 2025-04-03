@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: esko-app
+    env: docker
+    plan: free
+    buildCommand: docker build -t esko-app .
+    startCommand: docker run -p $PORT:3001 esko-app
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001 
