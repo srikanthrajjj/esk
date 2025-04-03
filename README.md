@@ -1,100 +1,97 @@
-# ESKO - Police Case Management System
+# React + TypeScript + Vite
 
-A modern case management system for police officers, victims, and administrators. This application facilitates real-time communication, case tracking, appointment scheduling, and document management between police departments and crime victims.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
+
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
+
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
+```
+
+# Police & Victim Communication App
+
+A real-time communication application for police officers and victims.
 
 ## Features
 
-- **Real-time Communication**: WebSocket-based messaging between police officers, victims, and administrators
-- **Case Management**: Create, view, and manage criminal cases with full details
-- **User Roles**: Separate interfaces for police officers, victims, and administrators
-- **Appointment Scheduling**: Schedule and manage meetings and appointments with victims
-- **Document Handling**: Upload and share documents related to cases
-- **Responsive Design**: Works on both desktop and mobile devices
+- Real-time messaging between police officers, victims, and admin
+- Case management system
+- Appointment scheduling
+- VCOP updates and document management
+- Interactive dashboard for police and victims
 
-## Tech Stack
+## How to run on Glitch
 
-- **Frontend**: React, TypeScript, Tailwind CSS, Vite
-- **Backend**: Node.js, Socket.io for real-time communication
-- **Deployment**: Docker-ready, deployable to Render, Railway, or any other platform
+This application is pre-configured for Glitch deployment. Once you import the repository into Glitch:
 
-## Getting Started
+1. Glitch will automatically install dependencies and build the project
+2. The app will automatically start when all dependencies are installed
+3. You can see your app running at your-project-name.glitch.me
 
-### Prerequisites
+## Developing locally
 
-- Node.js (v20 or later)
-- npm or yarn
+To run this project locally:
 
-### Local Development
-
-1. Clone the repository
 ```bash
-git clone https://github.com/srikanthrajjj/esk.git
-cd esk
-```
-
-2. Install dependencies
-```bash
+# Install dependencies
 npm install
-```
 
-3. Start the development server
-```bash
-# In one terminal window, start the WebSocket server
-npm run websocket
-
-# In another terminal window, start the frontend
+# Run the server and client concurrently
 npm run dev
 ```
 
-4. Access the application
-- Frontend: http://localhost:5173
-- WebSocket server: http://localhost:3002
+This will start the server on port 3002 and the frontend on port 5173 (or another available port).
 
-## Deployment to Render
+## User roles
 
-This application is configured for easy deployment to [Render](https://render.com) using the `render.yaml` blueprint.
+- **Officer**: Login with ID "off1"
+- **Victim**: Login with ID "victim-michael"
+- **Admin**: Login with ID "admin-user" 
 
-### Automatic Deployment
+## Tech stack
 
-1. Fork this repository to your GitHub account
-2. In Render, create a new "Blueprint" deployment
-3. Connect your GitHub account and select the forked repository
-4. Render will automatically detect the `render.yaml` file and create both services:
-   - esko-frontend: The static frontend site
-   - esko-backend: The WebSocket server
-
-### Manual Deployment
-
-#### Backend Service
-
-1. In Render, create a new "Web Service"
-2. Connect your GitHub repository
-3. Use these settings:
-   - Name: esko-backend
-   - Runtime: Node
-   - Build Command: `npm install`
-   - Start Command: `npm run start:prod`
-   - Add environment variables:
-     - NODE_ENV: production
-     - PORT: 3001
-
-#### Frontend Service
-
-1. In Render, create a new "Static Site"
-2. Connect your GitHub repository
-3. Use these settings:
-   - Name: esko-frontend
-   - Build Command: `npm run build`
-   - Publish Directory: `dist`
-   - Add environment variables:
-     - VITE_WS_URL: (Use the URL of your backend service)
-
-## Environment Variables
-
-- `NODE_ENV`: Set to "production" for production deployments
-- `PORT`: The port for the WebSocket server (default: 3001)
-- `VITE_WS_URL`: WebSocket server URL for the frontend to connect to
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- React with TypeScript
+- Tailwind CSS
+- Socket.io for real-time communication
+- Vite for frontend build

@@ -1,99 +1,29 @@
+const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
-const fs = require('fs');
+const socketIO = require('socket.io');
 const path = require('path');
+const fs = require('fs');
+const { Server } = require('socket.io');
 
-// Determine if we're in production mode
-const isProduction = process.env.NODE_ENV === 'production';
+// Create Express app
+const app = express();
 
-// Create an HTTP server
-const server = http.createServer((req, res) => {
-  // In production, serve static files from the dist directory
-  if (isProduction && req.url !== '/socket.io/') {
-    const filePath = path.join(__dirname, 'dist', req.url === '/' ? 'index.html' : req.url);
-    
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-      if (err) {
-        // If file not found, serve index.html (for SPA routing)
-        fs.readFile(path.join(__dirname, 'dist', 'index.html'), (err, content) => {
-          if (err) {
-            res.writeHead(500);
-            res.end('Error loading index.html');
-            return;
-          }
-          res.writeHead(200, { 'Content-Type': 'text/html' });
-          res.end(content, 'utf-8');
-        });
-        return;
-      }
-      
-      // Determine content type based on file extension
-      const extname = path.extname(filePath);
-      let contentType = 'text/html';
-      
-      switch (extname) {
-        case '.js':
-          contentType = 'text/javascript';
-          break;
-        case '.css':
-          contentType = 'text/css';
-          break;
-        case '.json':
-          contentType = 'application/json';
-          break;
-        case '.png':
-          contentType = 'image/png';
-          break;
-        case '.jpg':
-          contentType = 'image/jpg';
-          break;
-        case '.svg':
-          contentType = 'image/svg+xml';
-          break;
-      }
-      
-      // Read and serve the file
-      fs.readFile(filePath, (err, content) => {
-        if (err) {
-          res.writeHead(500);
-          res.end(`Error loading ${filePath}`);
-          return;
-        }
-        res.writeHead(200, { 'Content-Type': contentType });
-        res.end(content, 'utf-8');
-      });
-    });
-  } else {
-    // For WebSocket requests, let Socket.io handle them
-    res.writeHead(404);
-    res.end();
-  }
-});
+// Serve static files from the 'dist' directory
+app.use(express.static(path.join(__dirname, 'dist')));
 
-// Determine allowed origins based on environment
-const getAllowedOrigins = () => {
-  if (isProduction) {
-    // In production, be more restrictive with CORS
-    return [
-      process.env.FRONTEND_URL || 'https://esko-frontend.onrender.com',
-      'https://esko-backend.onrender.com'
-    ];
-  } else {
-    // In development, allow all origins
-    return '*';
-  }
-};
+// Create HTTP server
+const server = http.createServer(app);
 
 // Create a Socket.io server with CORS configuration
 const io = new Server(server, {
   cors: {
-    origin: getAllowedOrigins(),
+    origin: '*',  // Allow all origins in development
     methods: ['GET', 'POST'],
     credentials: true
   },
   pingTimeout: 60000,
   pingInterval: 25000,
-  transports: ['websocket', 'polling'], // Allow polling as fallback in production
+  transports: ['websocket'],
   allowEIO3: true
 });
 
@@ -294,9 +224,31 @@ io.on('connection', (socket) => {
   });
 });
 
+// Add a catch-all route to serve index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
 // Start the server with error handling
 const PORT = process.env.PORT || 3002;
 const HOST = '0.0.0.0';  // Listen on all network interfaces
+
+// Configure CORS for production
+io.origins((origin, callback) => {
+  const allowedOrigins = [
+    'https://your-netlify-app.netlify.app', // Replace with your Netlify URL
+    'http://localhost:5173',
+    'http://localhost:5174'
+  ];
+  
+  // In development, allow all connections
+  if (!origin || allowedOrigins.includes(origin)) {
+    callback(null, true);
+  } else {
+    console.log(`Origin ${origin} not allowed by CORS`);
+    callback(new Error('Not allowed by CORS'));
+  }
+});
 
 server.on('error', (error) => {
   console.error('Server error:', error);

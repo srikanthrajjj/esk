@@ -1,32 +1,12 @@
 services:
-  # Frontend static site
   - type: web
-    name: esko-frontend
-    env: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    headers:
-      - path: /*
-        name: Cache-Control
-        value: no-cache
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_WS_URL
-        fromService:
-          name: esko-backend
-          type: web
-          envVarKey: RENDER_EXTERNAL_URL
-
-  # Backend WebSocket server
-  - type: web
-    name: esko-backend
-    env: node
+    name: esko-app
+    env: docker
     plan: free
-    buildCommand: npm install
-    startCommand: npm run start:prod
+    buildCommand: docker build -t esko-app .
+    startCommand: docker run -p $PORT:3001 esko-app
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: PORT
         value: 3001 

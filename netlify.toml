@@ -2,8 +2,8 @@
   remote_images = ["https://source.unsplash.com/.*", "https://images.unsplash.com/.*", "https://ext.same-assets.com/.*", "https://ugc.same-assets.com/.*"]
 
 [build]
-  command = "npm run build"
   publish = "dist"
+  command = "npm run build"
 
 [[redirects]]
   from = "/*"
@@ -12,3 +12,4 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  VITE_WS_URL = "https://your-backend-url.herokuapp.com"
